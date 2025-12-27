@@ -4,7 +4,7 @@ import * as React from 'react';
 import { summarizeLectureNotes } from '@/ai/flows/summarize-lecture-notes';
 import { generateExamQuiz } from '@/ai/flows/generate-exam-quiz';
 import { answerQuestionFromNotes } from '@/ai/flows/answer-question-from-notes';
-import type { QuizData, ChatMessage } from '@/lib/types';
+import type { QuizData, ChatMessage, QuizQuestion } from '@/lib/types';
 import { LeftColumn } from '@/components/app/LeftColumn';
 import { RightColumn } from '@/components/app/RightColumn';
 import { useToast } from '@/hooks/use-toast';
@@ -64,11 +64,14 @@ export default function Home() {
     }
   };
 
-  const handleGenerateQuiz = async () => {
+  const handleGenerateQuiz = async (previousQuestions?: QuizQuestion[]) => {
     if (!pdfFile) return;
     setLoading((prev) => ({ ...prev, quiz: true }));
     try {
-      const result = await generateExamQuiz({ pdfDataUri: pdfFile.dataUri });
+      const result = await generateExamQuiz({ 
+        pdfDataUri: pdfFile.dataUri,
+        previousQuestions
+      });
       setQuiz(result);
       setActiveView('quiz');
     } catch (error) {
@@ -113,7 +116,7 @@ export default function Home() {
         pdfFile={pdfFile}
         setPdfFile={handleSetPdfFile}
         onGenerateSummary={handleGenerateSummary}
-        onGenerateQuiz={handleGenerateQuiz}
+        onGenerateQuiz={() => handleGenerateQuiz()}
         loading={loading}
       />
       <RightColumn
@@ -123,7 +126,9 @@ export default function Home() {
         quiz={quiz}
         chatHistory={chatHistory}
         onChatSubmit={handleChatSubmit}
+        onGenerateQuiz={handleGenerateQuiz}
         isChatLoading={loading.chat}
+        isQuizLoading={loading.quiz}
         isPdfUploaded={!!pdfFile}
       />
     </div>

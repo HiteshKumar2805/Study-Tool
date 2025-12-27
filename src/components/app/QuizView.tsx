@@ -10,20 +10,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { X, CheckCircle2, XCircle, Trophy } from 'lucide-react';
-import type { QuizData } from '@/lib/types';
+import { X, CheckCircle2, XCircle, Trophy, RefreshCw, Loader2 } from 'lucide-react';
+import type { QuizData, QuizQuestion } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { TextToSpeechButton } from './TextToSpeechButton';
 
 interface QuizViewProps {
   quiz: QuizData;
   onClose: () => void;
+  onGenerateQuiz: (previousQuestions: QuizQuestion[]) => Promise<void>;
+  isQuizLoading: boolean;
 }
 
 type QuizState = 'answering' | 'results';
 type UserAnswers = Record<number, string>;
 
-export function QuizView({ quiz, onClose }: QuizViewProps) {
+export function QuizView({ quiz, onClose, onGenerateQuiz, isQuizLoading }: QuizViewProps) {
   const [quizState, setQuizState] = React.useState<QuizState>('answering');
   const [userAnswers, setUserAnswers] = React.useState<UserAnswers>({});
   const [score, setScore] = React.useState(0);
@@ -39,6 +41,14 @@ export function QuizView({ quiz, onClose }: QuizViewProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
   });
+  
+  // Reset form when quiz data changes
+  React.useEffect(() => {
+    form.reset();
+    setUserAnswers({});
+    setScore(0);
+    setQuizState('answering');
+  }, [quiz, form]);
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     setUserAnswers(data);
@@ -51,6 +61,10 @@ export function QuizView({ quiz, onClose }: QuizViewProps) {
     setScore(correctCount);
     setQuizState('results');
   };
+
+  const handleNewSet = () => {
+    onGenerateQuiz(quiz.questions);
+  }
 
   const scorePercentage = (score / quiz.questions.length) * 100;
 
@@ -107,8 +121,15 @@ export function QuizView({ quiz, onClose }: QuizViewProps) {
             </div>
           </ScrollArea>
         </CardContent>
-        <CardFooter className="pt-6">
-            <Button onClick={() => setQuizState('answering')} className="w-full">Try Again</Button>
+        <CardFooter className="pt-6 grid grid-cols-2 gap-4">
+            <Button onClick={() => setQuizState('answering')} variant="secondary" className="w-full">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try Again
+            </Button>
+            <Button onClick={handleNewSet} className="w-full" disabled={isQuizLoading}>
+              {isQuizLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+              New Set
+            </Button>
         </CardFooter>
       </Card>
     );
@@ -121,11 +142,17 @@ export function QuizView({ quiz, onClose }: QuizViewProps) {
           <CardTitle>Generated Quiz</CardTitle>
           <CardDescription>Test your knowledge based on the document.</CardDescription>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+        <Button variant="ghost" size="icon" onClick={onClose} disabled={isQuizLoading}>
           <X className="h-5 w-5" />
         </Button>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
+        {isQuizLoading ? (
+            <div className="flex items-center justify-center h-full flex-col">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-lg font-medium text-muted-foreground">Generating a fresh set of questions...</p>
+            </div>
+        ) : (
         <ScrollArea className="h-full pr-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -160,6 +187,7 @@ export function QuizView({ quiz, onClose }: QuizViewProps) {
             </form>
           </Form>
         </ScrollArea>
+        )}
       </CardContent>
     </Card>
   );

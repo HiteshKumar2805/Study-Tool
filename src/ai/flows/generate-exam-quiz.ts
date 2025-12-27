@@ -11,12 +11,19 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const QuestionSchema = z.object({
+  question: z.string(),
+  options: z.array(z.string()),
+  correctAnswer: z.string(),
+});
+
 const GenerateExamQuizInputSchema = z.object({
   pdfDataUri: z
     .string()
     .describe(
       'A PDF document represented as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' // keep the single quotes in the string literal, to avoid prematurely terminating the string.
     ),
+  previousQuestions: z.array(QuestionSchema).optional().describe('An optional array of previous questions to avoid repeating.'),
 });
 export type GenerateExamQuizInput = z.infer<typeof GenerateExamQuizInputSchema>;
 
@@ -46,6 +53,13 @@ const generateExamQuizPrompt = ai.definePrompt({
   The quiz should test the user's understanding of the key concepts and ideas presented in the document.
 
   The quiz should have 5 questions, each with 4 possible answers. One of the answers should be the correct answer.
+
+  {{#if previousQuestions}}
+  Please generate a NEW set of questions that are different from the following questions:
+  {{#each previousQuestions}}
+  - Question: {{{this.question}}}
+  {{/each}}
+  {{/if}}
 
   PDF Document: {{media url=pdfDataUri}}
   `,
