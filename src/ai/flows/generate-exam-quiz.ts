@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating a 3-question multiple-choice quiz from lecture notes in a PDF format.
+ * @fileOverview This file defines a Genkit flow for generating a 5-question multiple-choice quiz from lecture notes in a PDF format.
  *
- * - generateExamQuiz - An async function that takes PDF data URI as input and returns a quiz with 3 questions.
+ * - generateExamQuiz - An async function that takes PDF data URI as input and returns a quiz with 5 questions.
  * - GenerateExamQuizInput - The input type for the generateExamQuiz function.
  * - GenerateExamQuizOutput - The output type for the generateExamQuiz function.
  */
@@ -27,7 +27,7 @@ const GenerateExamQuizOutputSchema = z.object({
       options: z.array(z.string()).describe('An array of possible answers.'),
       correctAnswer: z.string().describe('The correct answer to the question.'),
     })
-  ).length(3).describe('An array of 3 multiple-choice questions.'),
+  ).length(5).describe('An array of 5 multiple-choice questions.'),
 });
 export type GenerateExamQuizOutput = z.infer<typeof GenerateExamQuizOutputSchema>;
 
@@ -41,11 +41,11 @@ const generateExamQuizPrompt = ai.definePrompt({
   output: {schema: GenerateExamQuizOutputSchema},
   prompt: `You are an expert at creating multiple-choice quizzes from lecture notes.
 
-  Create a 3-question multiple-choice quiz based on the content of the following PDF document.
+  Create a 5-question multiple-choice quiz based on the content of the following PDF document.
 
   The quiz should test the user's understanding of the key concepts and ideas presented in the document.
 
-  The quiz should have 3 questions, each with 4 possible answers. One of the answers should be the correct answer.
+  The quiz should have 5 questions, each with 4 possible answers. One of the answers should be the correct answer.
 
   PDF Document: {{media url=pdfDataUri}}
   `,
