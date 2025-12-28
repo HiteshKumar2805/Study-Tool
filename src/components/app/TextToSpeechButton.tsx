@@ -18,43 +18,32 @@ interface TextToSpeechButtonProps extends React.HTMLAttributes<HTMLButtonElement
 
 export function TextToSpeechButton({ text, className, ...props }: TextToSpeechButtonProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  
-  // Using useEffect to handle client-side only APIs
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
   useEffect(() => {
+    // This effect now correctly handles client-side only APIs
     const synth = window.speechSynthesis;
     const utterance = new SpeechSynthesisUtterance(text);
 
     const onEnd = () => setIsSpeaking(false);
     utterance.addEventListener('end', onEnd);
     
-    // Set state when speech starts
     const onStart = () => setIsSpeaking(true);
     utterance.addEventListener('start', onStart);
-
-    const handleToggleSpeech = () => {
-      if (synth.speaking) {
-        synth.cancel();
-        setIsSpeaking(false);
-      } else {
-        synth.speak(utterance);
-      }
-    };
-    
-    // Attach click handler to the button
-    const buttonElement = document.getElementById(`tts-btn-${text.slice(0, 10)}`);
-    buttonElement?.addEventListener('click', handleToggleSpeech);
 
     return () => {
       // Cleanup: remove listeners and cancel any speech
       utterance.removeEventListener('end', onEnd);
       utterance.removeEventListener('start', onStart);
-      buttonElement?.removeEventListener('click', handleToggleSpeech);
-      synth.cancel();
+      if (synth.speaking) {
+        synth.cancel();
+      }
     };
   }, [text]);
 
 
-  const handleToggleSpeech = () => {
+  const handleToggleSpeech = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     const synth = window.speechSynthesis;
     if (synth.speaking) {
         synth.cancel();
@@ -72,7 +61,6 @@ export function TextToSpeechButton({ text, className, ...props }: TextToSpeechBu
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            id={`tts-btn-${text.slice(0, 10)}`}
             variant="ghost"
             size="icon"
             onClick={handleToggleSpeech}
