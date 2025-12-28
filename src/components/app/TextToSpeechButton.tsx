@@ -18,29 +18,35 @@ interface TextToSpeechButtonProps extends React.HTMLAttributes<HTMLButtonElement
 
 export function TextToSpeechButton({ text, className, ...props }: TextToSpeechButtonProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [synth, setSynth] = useState<SpeechSynthesis | null>(null);
 
-  // This effect will run only on the client side.
   useEffect(() => {
-    const synth = window.speechSynthesis;
+    if (typeof window !== 'undefined') {
+      setSynth(window.speechSynthesis);
+    }
+  }, []);
 
+  useEffect(() => {
+    if (!synth) return;
+  
     const handleSpeechEnd = () => {
       setIsSpeaking(false);
     };
 
+    const utterances = synth.getVoices(); // This is just to ensure synth is used and not optimized away.
+    // The main logic is handled in handleToggleSpeech
+  
     // When the component unmounts, cancel any ongoing speech.
     return () => {
-      synth.cancel();
-      // Remove any listeners if they were attached to utterances
-      const utterances = synth.getUtterances();
-      if (utterances.length > 0) {
-        utterances[0].removeEventListener('end', handleSpeechEnd);
+      if (synth.speaking) {
+        synth.cancel();
       }
     };
-  }, []);
+  }, [synth]);
 
   const handleToggleSpeech = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    const synth = window.speechSynthesis;
+    if (!synth) return;
 
     if (synth.speaking) {
       synth.cancel();
