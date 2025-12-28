@@ -2,10 +2,11 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ActiveView } from '@/app/page';
-import type { QuizData, ChatMessage, QuizQuestion } from '@/lib/types';
+import type { QuizData, ChatMessage, QuizQuestion, FeynmanData } from '@/lib/types';
 import { ChatView } from './ChatView';
 import { SummaryView } from './SummaryView';
 import { QuizView } from './QuizView';
+import { FeynmanView } from './FeynmanView';
 import { Loader2 } from 'lucide-react';
 
 interface RightColumnProps {
@@ -13,12 +14,17 @@ interface RightColumnProps {
   setActiveView: (view: ActiveView) => void;
   summary: string | null;
   quiz: QuizData | null;
+  feynmanData: FeynmanData | null;
   chatHistory: ChatMessage[];
   onChatSubmit: (question: string) => Promise<void>;
   onGenerateQuiz: (previousQuestions?: QuizQuestion[]) => Promise<void>;
+  onFeynmanSubmit: (explanation: string) => Promise<void>;
+  onStartFeynman: () => Promise<void>;
   isChatLoading: boolean;
   isQuizLoading: boolean;
   isSummaryLoading: boolean;
+  isFeynmanLoading: boolean;
+  isFeynmanGrading: boolean;
   isPdfUploaded: boolean;
 }
 
@@ -36,12 +42,17 @@ export function RightColumn({
   setActiveView,
   summary,
   quiz,
+  feynmanData,
   chatHistory,
   onChatSubmit,
   onGenerateQuiz,
+  onFeynmanSubmit,
+  onStartFeynman,
   isChatLoading,
   isQuizLoading,
   isSummaryLoading,
+  isFeynmanLoading,
+  isFeynmanGrading,
   isPdfUploaded,
 }: RightColumnProps) {
   const handleClose = () => setActiveView('chat');
@@ -62,7 +73,6 @@ export function RightColumn({
         if (summary) return <SummaryView summary={summary} onClose={handleClose} />;
         return null;
       case 'quiz':
-        // The loading state is handled inside QuizView for new set generation
         if (isQuizLoading && !quiz) return <LoadingPlaceholder text="Generating quiz..." />;
         if (quiz) return (
             <QuizView
@@ -71,6 +81,19 @@ export function RightColumn({
                 onGenerateQuiz={onGenerateQuiz}
                 isQuizLoading={isQuizLoading}
             />
+        );
+        return null;
+      case 'feynman':
+        if (isFeynmanLoading) return <LoadingPlaceholder text="Getting a topic..." />;
+        if (feynmanData) return (
+          <FeynmanView
+            feynmanData={feynmanData}
+            onClose={handleClose}
+            onSubmit={onFeynmanSubmit}
+            onNewTopic={onStartFeynman}
+            isGrading={isFeynmanGrading}
+            isNewTopicLoading={isFeynmanLoading}
+          />
         );
         return null;
       default:

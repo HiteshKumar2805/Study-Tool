@@ -3,7 +3,7 @@
 import { FileUpload } from '@/components/app/FileUpload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb, Loader2, BookCheck, FileText, HelpCircle } from 'lucide-react';
+import { Lightbulb, Loader2, BookCheck, FileText, HelpCircle, Sparkles } from 'lucide-react';
 import { HelpGuide } from '@/components/app/HelpGuide';
 
 type PdfFile = {
@@ -16,13 +16,16 @@ interface LeftColumnProps {
   setPdfFile: (file: PdfFile | null) => void;
   onGenerateSummary: () => void;
   onGenerateQuiz: () => void;
+  onStartFeynman: () => void;
   loading: {
     summary: boolean;
     quiz: boolean;
+    feynman?: boolean;
   };
 }
 
-export function LeftColumn({ pdfFile, setPdfFile, onGenerateSummary, onGenerateQuiz, loading }: LeftColumnProps) {
+export function LeftColumn({ pdfFile, setPdfFile, onGenerateSummary, onGenerateQuiz, onStartFeynman, loading }: LeftColumnProps) {
+  const isAnyLoading = loading.summary || loading.quiz || loading.feynman;
   return (
     <aside className="w-[380px] flex-shrink-0 border-r bg-background p-6 flex flex-col gap-6">
       <header className="flex items-center gap-3">
@@ -41,7 +44,7 @@ export function LeftColumn({ pdfFile, setPdfFile, onGenerateSummary, onGenerateQ
         <h2 className="text-sm font-semibold text-muted-foreground px-2">AI Tools</h2>
         <Button
           onClick={onGenerateSummary}
-          disabled={!pdfFile || loading.summary || loading.quiz}
+          disabled={!pdfFile || isAnyLoading}
           size="lg"
           variant="ghost"
           className="w-full justify-start text-base h-11"
@@ -56,7 +59,7 @@ export function LeftColumn({ pdfFile, setPdfFile, onGenerateSummary, onGenerateQ
 
         <Button
           onClick={onGenerateQuiz}
-          disabled={!pdfFile || loading.quiz || loading.summary}
+          disabled={!pdfFile || isAnyLoading}
           size="lg"
           variant="ghost"
           className="w-full justify-start text-base h-11"
@@ -67,6 +70,21 @@ export function LeftColumn({ pdfFile, setPdfFile, onGenerateSummary, onGenerateQ
             <Lightbulb className="mr-2 h-4 w-4" />
           )}
           Generate Quiz
+        </Button>
+
+        <Button
+          onClick={onStartFeynman}
+          disabled={!pdfFile || isAnyLoading}
+          size="lg"
+          variant="ghost"
+          className="w-full justify-start text-base h-11"
+        >
+          {loading.feynman ? (
+            <Loader2 className="animate-spin mr-2 h-4 w-4" />
+          ) : (
+            <Sparkles className="mr-2 h-4 w-4" />
+          )}
+          Feynman Technique
         </Button>
       </div>
       
