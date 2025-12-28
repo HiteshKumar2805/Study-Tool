@@ -83,8 +83,8 @@ export function FeynmanView({ feynmanData, onSubmit, onNewTopic, onClose, isGrad
     <Card className="h-full flex flex-col">
       <CardHeader className="flex-row items-center justify-between">
         <div>
-          <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/>Feynman Technique</CardTitle>
-          <CardDescription>Explain the concept simply, as if you're teaching it.</CardDescription>
+          <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/>Teach a Concept</CardTitle>
+          <CardDescription>Explain the concept simply, as if you're teaching it to someone else.</CardDescription>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onNewTopic} disabled={isNewTopicLoading}>

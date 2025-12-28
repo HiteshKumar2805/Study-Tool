@@ -84,7 +84,7 @@ export function LeftColumn({ pdfFile, setPdfFile, onGenerateSummary, onGenerateQ
           ) : (
             <Sparkles className="mr-2 h-4 w-4" />
           )}
-          Feynman Technique
+          Teach a Concept
         </Button>
       </div>
       
