@@ -21,6 +21,7 @@ import {
 import jsPDF from 'jspdf';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 
 interface ChatViewProps {
@@ -79,7 +80,7 @@ export function ChatView({ history, onSubmit, isLoading, isPdfUploaded }: ChatVi
     history.forEach((msg) => {
       const text = `${msg.role === 'user' ? 'You' : 'AI'}: ${msg.content}`;
       const splitText = doc.splitTextToSize(text, 180);
-      
+
       if (y + (splitText.length * 10) > 280) {
         doc.addPage();
         y = 10;
@@ -101,19 +102,22 @@ export function ChatView({ history, onSubmit, isLoading, isPdfUploaded }: ChatVi
           </div>
           <CardTitle className="text-lg font-semibold">Chat with your Notes</CardTitle>
         </div>
-        {history.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Download className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={downloadTxt}>Download as TXT</DropdownMenuItem>
-              <DropdownMenuItem onClick={downloadPdf}>Download as PDF</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          {history.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Download className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={downloadTxt}>Download as TXT</DropdownMenuItem>
+                <DropdownMenuItem onClick={downloadPdf}>Download as PDF</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
         <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
@@ -130,11 +134,11 @@ export function ChatView({ history, onSubmit, isLoading, isPdfUploaded }: ChatVi
             {history.map((message, index) => (
               <div key={index} className={cn('flex items-start gap-3', message.role === 'user' && 'justify-end')}>
                 {message.role === 'ai' && (
-                   <Avatar className="w-8 h-8">
-                     <AvatarFallback className="bg-primary/10 text-primary">
-                       <BotMessageSquare className="h-5 w-5" />
-                     </AvatarFallback>
-                   </Avatar>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <BotMessageSquare className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
                 )}
                 <div className="group relative max-w-[80%]">
                   <div
@@ -145,23 +149,23 @@ export function ChatView({ history, onSubmit, isLoading, isPdfUploaded }: ChatVi
                   >
                     <p className="whitespace-pre-wrap">{message.content}</p>
                   </div>
-                   {message.role === 'ai' && (
-                      <TextToSpeechButton text={message.content} className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
+                  {message.role === 'ai' && (
+                    <TextToSpeechButton text={message.content} className="absolute -bottom-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  )}
                 </div>
               </div>
             ))}
-            {isLoading && history[history.length-1]?.role === 'user' && (
+            {isLoading && history[history.length - 1]?.role === 'user' && (
               <div className="flex items-start gap-3">
-                 <Avatar className="w-8 h-8">
-                   <AvatarFallback className="bg-primary/10 text-primary">
-                     <BotMessageSquare className="h-5 w-5" />
-                   </AvatarFallback>
-                 </Avatar>
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    <BotMessageSquare className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
                 <div className="bg-muted rounded-lg p-3 flex items-center space-x-2 rounded-bl-none">
-                    <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-0"></span>
-                    <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-150"></span>
-                    <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-300"></span>
+                  <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-0"></span>
+                  <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-150"></span>
+                  <span className="h-2 w-2 bg-foreground/50 rounded-full animate-pulse delay-300"></span>
                 </div>
               </div>
             )}
@@ -184,9 +188,9 @@ export function ChatView({ history, onSubmit, isLoading, isPdfUploaded }: ChatVi
                           disabled={!isPdfUploaded || isLoading}
                           autoComplete="off"
                         />
-                         <Button type="submit" size="icon" disabled={!isPdfUploaded || isLoading} className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full h-8 w-8 bg-primary hover:bg-primary/90">
-                            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                          </Button>
+                        <Button type="submit" size="icon" disabled={!isPdfUploaded || isLoading} className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full h-8 w-8 bg-primary hover:bg-primary/90">
+                          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                        </Button>
                       </div>
                     </FormControl>
                   </FormItem>
