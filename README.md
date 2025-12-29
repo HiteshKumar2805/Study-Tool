@@ -72,3 +72,68 @@ Clone the repository:
 ```bash
 git clone https://github.com/your-username/VidyaAce.git
 cd VidyaAce
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+---
+
+### 🔐 Environment Configuration
+
+Create a `.env.local` file at the root of the project. This is your control plane—treat it with respect.
+
+```env
+# Google AI / Genkit
+GOOGLE_GENAI_API_KEY=your_gemini_api_key_here
+GOOGLE_CLOUD_PROJECT=your_google_cloud_project_id
+
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+### Running the Application
+
+Start the development server:
+```bash
+npm run dev
+```
+---
+
+## 🎯 Usage Workflow
+
+### 1️⃣ Upload
+- Drag and drop your lecture PDF into the upload zone.
+- VidyaAce ingests and contextualizes the document for downstream AI processing.
+
+---
+
+### 2️⃣ Select a Mode
+Choose how you want to engage with your material:
+
+- 💬 **Chat with Notes**  
+  Ask specific, context-aware questions directly against your uploaded PDF.
+
+- 🧠 **Summary**  
+  Generate concise, structured bullet-point summaries from dense lecture content.
+
+- 📝 **Quiz**  
+  Automatically generate MCQs to validate understanding and surface knowledge gaps.
+
+---
+
+### 3️⃣ Engage & Learn
+- Ask targeted questions to clarify concepts
+- Review AI-generated summaries for rapid revision
+- Take auto-graded quizzes with instant feedback
+- Identify weak areas and reinforce understanding
+
+> **Outcome:**  
+> This is **active learning**—designed for comprehension, retention, and mastery, not passive content consumption.
+
+### TEAM NAME : ZA WARDUO
