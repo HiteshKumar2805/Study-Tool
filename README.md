@@ -5,6 +5,9 @@
 
 ---
 
+### Deployed Link : https://study-tool-ten.vercel.app/<img width="592" height="61" alt="image" src="https://github.com/user-attachments/assets/afb5651a-3125-4c2e-86bf-d5745f48362a" />
+
+
 ## 🚀 Overview
 
 **VidyaAce** is an AI-powered educational platform purpose-built for engineering students who refuse to settle for rote memorization. It transforms static lecture notes into a dynamic learning loop—**ask, assess, reflect, and master**.
