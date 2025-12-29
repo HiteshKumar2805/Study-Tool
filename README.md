@@ -5,7 +5,7 @@
 
 ---
 
-### Deployed Link : https://study-tool-ten.vercel.app/<img width="592" height="61" alt="image" src="https://github.com/user-attachments/assets/afb5651a-3125-4c2e-86bf-d5745f48362a" />
+### Deployed Link : https://study-tool-ten.vercel.app/
 
 
 ## 🚀 Overview
