@@ -8,8 +8,8 @@
  * - GenerateExamQuizOutput - The output type for the generateExamQuiz function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const QuestionSchema = z.object({
   question: z.string(),
@@ -44,8 +44,8 @@ export async function generateExamQuiz(input: GenerateExamQuizInput): Promise<Ge
 
 const generateExamQuizPrompt = ai.definePrompt({
   name: 'generateExamQuizPrompt',
-  input: {schema: GenerateExamQuizInputSchema},
-  output: {schema: GenerateExamQuizOutputSchema},
+  input: { schema: GenerateExamQuizInputSchema },
+  output: { schema: GenerateExamQuizOutputSchema },
   prompt: `You are an expert at creating multiple-choice quizzes from lecture notes.
 
   Create a 5-question multiple-choice quiz based on the content of the following PDF document.
@@ -72,7 +72,29 @@ const generateExamQuizFlow = ai.defineFlow(
     outputSchema: GenerateExamQuizOutputSchema,
   },
   async input => {
-    const {output} = await generateExamQuizPrompt(input);
-    return output!;
+    const maxRetries = 3;
+    let attempt = 0;
+    while (true) {
+      try {
+        const { output } = await generateExamQuizPrompt(input);
+        return output!;
+      } catch (error: any) {
+        attempt++;
+        if (attempt > maxRetries || !error.message.includes('429')) {
+          throw error;
+        }
+
+        // Extract wait time from error message if available
+        const match = error.message.match(/retry in ([0-9.]+)s/);
+        let delay = 2000 * Math.pow(2, attempt); // Default backoff
+
+        if (match && match[1]) {
+          delay = Math.ceil(parseFloat(match[1]) * 1000) + 1000; // Add 1s buffer
+        }
+
+        console.log(`Rate limit hit. Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
   }
 );

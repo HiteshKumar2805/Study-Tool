@@ -8,8 +8,8 @@
  * - SummarizeLectureNotesOutput - The return type for the summarizeLectureNotes function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const SummarizeLectureNotesInputSchema = z.object({
   pdfDataUri: z
@@ -31,8 +31,8 @@ export async function summarizeLectureNotes(input: SummarizeLectureNotesInput): 
 
 const prompt = ai.definePrompt({
   name: 'summarizeLectureNotesPrompt',
-  input: {schema: SummarizeLectureNotesInputSchema},
-  output: {schema: SummarizeLectureNotesOutputSchema},
+  input: { schema: SummarizeLectureNotesInputSchema },
+  output: { schema: SummarizeLectureNotesOutputSchema },
   prompt: `You are an AI assistant that specializes in summarizing lecture notes.
 
   Given a PDF document of lecture notes, create a concise, bullet-point summary of the key concepts.
@@ -49,7 +49,29 @@ const summarizeLectureNotesFlow = ai.defineFlow(
     outputSchema: SummarizeLectureNotesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const maxRetries = 3;
+    let attempt = 0;
+    while (true) {
+      try {
+        const { output } = await prompt(input);
+        return output!;
+      } catch (error: any) {
+        attempt++;
+        if (attempt > maxRetries || !error.message.includes('429')) {
+          throw error;
+        }
+
+        // Extract wait time from error message if available
+        const match = error.message.match(/retry in ([0-9.]+)s/);
+        let delay = 2000 * Math.pow(2, attempt); // Default backoff
+
+        if (match && match[1]) {
+          delay = Math.ceil(parseFloat(match[1]) * 1000) + 1000; // Add 1s buffer
+        }
+
+        console.log(`Rate limit hit. Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
   }
 );

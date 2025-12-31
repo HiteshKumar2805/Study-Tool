@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { handleFileUpload } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -36,22 +35,30 @@ export function FileUpload({ onFileChange, uploadedFile }: FileUploadProps) {
     }
 
     setIsProcessing(true);
-    const formData = new FormData();
-    formData.append('pdf', file);
 
-    const result = await handleFileUpload(formData);
+    try {
+      const dataUri = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-    if ('error' in result) {
+      onFileChange({
+        name: file.name,
+        dataUri,
+      });
+    } catch (error) {
+      console.error('File reading error:', error);
       toast({
         variant: 'destructive',
         title: 'Upload Failed',
-        description: result.error,
+        description: 'Failed to read the file.',
       });
       onFileChange(null);
-    } else {
-      onFileChange(result);
+    } finally {
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
   };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
